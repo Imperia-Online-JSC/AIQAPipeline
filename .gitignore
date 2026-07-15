@@ -1,0 +1,21 @@
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+.vscode
+.env
+
+# Agent pipeline runtime files (change every run — not version controlled)
+.agents/feedback.md
+.agents/test-tasks.md
+.agents/execution-log.md
+
+# Pipeline scratch artifacts (binary / per-cycle debug output — cleared at cycle start)
+.playwright-mcp/
+/*.png
+/*.jpe?g
+
+# NOTE: .agents/archive/ and .agents/pipeline-status.md are intentionally NOT ignored —
+# archive/ is the durable QA trail, pipeline-status.md is the at-a-glance current state.

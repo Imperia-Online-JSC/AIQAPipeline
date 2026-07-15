@@ -1,0 +1,46 @@
+{
+  "app": {
+    "name": "CHANGE_ME",
+    "baseURL": "https://CHANGE_ME.example.com/",
+    "allowedURLs": [
+      "https://CHANGE_ME.example.com/"
+    ],
+    "_comment_allowedURLs": "Hard allow-list. The Explore stage refuses to navigate anywhere not listed here — this is the guardrail that stops an agent from wandering onto production or a third-party domain."
+  },
+
+  "auth": {
+    "strategy": "none",
+    "_comment_strategy": "one of: none | fresh-registration | existing-credentials",
+
+    "fresh": {
+      "_comment": "used when strategy = fresh-registration. {ts} is replaced with testInfo.workerIndex + Date.now().",
+      "usernamePattern": "user{ts}",
+      "passwordPattern": "Test1234!",
+      "emailPattern": "user{ts}@test.com",
+      "registerUrl": "CHANGE_ME"
+    },
+
+    "existing": {
+      "_comment": "used when strategy = existing-credentials. Put real creds in .env, not here — this file is checked into git.",
+      "usernameEnvVar": "PIPELINE_USERNAME",
+      "passwordEnvVar": "PIPELINE_PASSWORD",
+      "loginUrl": "CHANGE_ME",
+      "sharedAccount": true,
+      "_comment_sharedAccount": "true = only one session allowed server-side (like Imperia's sqla) -> pipeline runs any suite using this account with --workers=1 and test.describe.configure({ mode: 'serial' }). Set false if the backend allows concurrent sessions for the same login.",
+      "postLoginExtraStep": null,
+      "_comment_postLoginExtraStep": "optional free-text note for a second step after the login button (e.g. a realm/tenant/workspace picker) — the Explore stage documents the exact selector once it finds it."
+    }
+  },
+
+  "asyncPattern": {
+    "type": "none",
+    "_comment_type": "one of: none | networkResponse. If the app updates the UI via background XHR/fetch calls (Imperia's xajax_loader.php, a GraphQL endpoint, a REST API, ...), set type=networkResponse and give a urlGlob so generated tests wait on the real response instead of a fixed sleep.",
+    "urlGlob": null
+  },
+
+  "timeouts": {
+    "simple": 60000,
+    "sharedAccount": 120000,
+    "longFlow": 600000
+  }
+}
