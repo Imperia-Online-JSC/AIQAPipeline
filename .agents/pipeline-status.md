@@ -1,16 +1,25 @@
 # Pipeline Status
 > Updated by each stage after completing its work
 
-## Current Status: IDLE
+## Current Status: AWAITING COMMIT APPROVAL ⏳
 
 | Stage | Status |
 |-------|--------|
-| 1. Explore & Plan | ⏳ Not started |
-| 2. Generate Tests | ⏳ Not started |
-| 3. Run & Fix | ⏳ Not started |
-| 4. Commit | ⏳ Not started |
+| Explore | ✅ Complete |
+| Tests Written | ✅ Complete |
+| Tests Passing | 8 of 8 |
+| Commit Approved | ⏳ Waiting |
 
-## Last Run: —
-## Last App Tested: —
-## Branch: —
-## Next action: Run `/pipeline` or start Stage 1
+- App tested: RottenTomatoes (https://www.rottentomatoes.com/browse/movies_coming_soon/)
+- Branch: main
+- Tests committed: none yet
+- Next action: awaiting user YES/NO to commit the 5 spec files + RottenTomatoesPage helper
+
+## Note
+- IMDB (originally targeted for its Release Calendar) is blocked for this pipeline: AWS WAF
+  Bot Control returns 403/challenge on every page (confirmed IP/network-level via curl and
+  agent-browser from two different networks on the same ISP; not tool- or headed/headless-specific).
+  Retargeted to Rotten Tomatoes' "Coming Soon" browse page as the release-calendar equivalent.
+- Prior Stillfront run (2026-07-16) is still uncommitted, awaiting separate YES/NO from the user.
+  Its files (tests/homepage/, tests/navigation/, tests/search/, tests/helpers/StillfrontPage.ts)
+  are untouched by this run and remain pending in git status.

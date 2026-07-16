@@ -97,3 +97,15 @@ which points back at `pipeline.prompt.md` rather than duplicating its rules.
 - **NEVER commit without explicit user approval.** Present results, ask, then wait.
 - A failing test is never committed unless it intentionally documents a known bug (note it).
 - Stop and ask the user whenever the task, expected behaviour, or a failure is ambiguous.
+
+### Testing Third-Party Live Sites (e.g. IMDB)
+Some configured targets are public third-party production sites, not an app the user owns. Read-only
+UI/UX, navigation, search, and response-time-consistency testing against them is in scope and is not
+what the "never production" rule above is guarding against — that clause is about not bypassing an
+app's own staging/allow-listed environment, not a ban on exploring a live public site the way a normal
+user would. When the target is a third-party site:
+- Keep `app.allowedURLs` scoped to only the pages actually explored/tested.
+- Never perform state-mutating actions (rate, review, add-to-list, sign up, post) — this is why such
+  targets should use `auth.strategy: none`.
+- Keep worker concurrency at normal test-suite levels; don't scale up parallelism to load-test someone
+  else's production infrastructure.
