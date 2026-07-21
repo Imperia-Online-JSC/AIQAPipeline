@@ -26,9 +26,9 @@ follow it exactly.** The per-stage detail is in the sibling prompt files:
 | Stage | What you do |
 |-------|-------------|
 | 1. Explore | Use the **agent-browser** skill (`agent-browser skills get core`, then drive it via the CLI). Write findings to `.agents/feedback.md`. NEVER touch a URL outside `config/pipeline.config.json`'s `app.allowedURLs`. |
-| 2. Generate | Use `Read`/`Grep` to study `config/pipeline.config.json`, `tests/helpers/`, `tests/`; use `Write`/`Edit` to create/extend the page object and specs. Record them in `.agents/test-tasks.md`. Never put specs in `/specs/`. |
-| 3. Execute (Copilot role) | Use `Bash`: `npx playwright test tests/[file] --reporter=list` (add `--project=target-chromium` as needed). **Add `--workers=1` whenever `auth.existing.sharedAccount` is `true` and more than one such file runs together.** Heal failures with the fix checklist in `execute.prompt.md`, ONE fix + re-run per failure. |
-| 3. Commit | Only after the user replies **YES**. Then `git add` / `git commit` the passing files. Update `.agents/execution-log.md` and `.agents/pipeline-status.md`. |
+| 2. Generate | Use `Read`/`Grep` to study `config/pipeline.config.json`, `tests/helpers/`, `tests/`; use `Write`/`Edit` to create/extend the page object and specs. **Snapshot each generated/changed spec to `.agents/heal-baseline/` (generate.prompt.md Step 5.5) so the heal-gate has a baseline.** Record them in `.agents/test-tasks.md`. Never put specs in `/specs/`. |
+| 3. Execute (Copilot role) | Use `Bash`: `npx playwright test tests/[file] --reporter=list` (add `--project=target-chromium` as needed). **Add `--workers=1` whenever `auth.existing.sharedAccount` is `true` and more than one such file runs together.** Heal failures with the fix checklist in `execute.prompt.md`, ONE fix + re-run per failure — **addressing/timing only, never edit an assertion to force green.** If you healed anything, run `npm run heal-gate` before the commit ask (Step 3.5). |
+| 3. Commit | Only after the user replies **YES** AND the heal-gate is clean. Then `git add` / `git commit` the passing files (the pre-commit hook re-checks). Update `.agents/execution-log.md` and `.agents/pipeline-status.md`. |
 
 ## Before doing anything
 Read `config/pipeline.config.json`. If `app.name`, `app.baseURL`, or `auth.strategy` still
@@ -42,6 +42,10 @@ running any stage.
   suites with `--workers=1`. Fresh-account tests may run parallel.
 - **NEVER commit without explicit user approval.** Present results, ask, then wait.
 - A failing test is never committed unless it intentionally documents a known bug (note it).
+- **NEVER over-heal.** Heals repair addressing/timing only (selectors, waits, timeouts, setup) —
+  never delete/weaken/skip an assertion, change an expected value, or swallow a failure. An
+  assertion failure = candidate bug → NEEDS REVIEW, escalate. Enforced by `scripts/heal-gate.mjs`
+  + the pre-commit hook; never bypass with `--no-verify`.
 - Stop and ask whenever the task, expected behaviour, or a failure is ambiguous
   (see "Human Escalation Rules" in `pipeline.prompt.md`).
 

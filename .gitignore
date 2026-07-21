@@ -12,6 +12,10 @@ node_modules/
 .agents/test-tasks.md
 .agents/execution-log.md
 
+# Heal-gate baselines: the Generate stage snapshots each freshly-generated spec here so the
+# over-heal gate can diff a same-run heal against the pre-heal version. Per-run scratch, not committed.
+.agents/heal-baseline/
+
 # Pipeline scratch artifacts (binary / per-cycle debug output — cleared at cycle start)
 .playwright-mcp/
 /*.png

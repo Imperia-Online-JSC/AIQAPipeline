@@ -88,6 +88,11 @@ If the config is filled in and the feature is clear, skip asking and start Stage
   parallel-safe.
 - **NEVER commit without explicit user approval.** Present results, ask, then wait.
 - A failing test is never committed unless it intentionally documents a known bug (note it).
+- **NEVER over-heal.** A heal may only repair *addressing/timing* (selectors, waits, timeouts,
+  setup). It may never delete/weaken/skip an assertion, change an expected value, or swallow a
+  failure to force green — that masks a real bug. An assertion failure is a *candidate bug*, not
+  a heal target: mark NEEDS REVIEW and escalate. Enforced by `scripts/heal-gate.mjs` (Execute
+  Step 3.5) and the pre-commit hook; a blocked heal cannot be committed. Do not `--no-verify`.
 - Stop and ask the user whenever the task, expected behaviour, or a failure is ambiguous.
 
 ---

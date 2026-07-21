@@ -7,7 +7,9 @@
     "test:headed": "playwright test --headed",
     "test:headed:chromium": "playwright test --headed --project=target-chromium",
     "record": "node scripts/record.mjs",
-    "report": "playwright show-report"
+    "report": "playwright show-report",
+    "heal-gate": "node scripts/heal-gate.mjs",
+    "prepare": "git config core.hooksPath .githooks || true"
   },
   "keywords": ["playwright", "ai-qa", "e2e", "agent"],
   "author": "",

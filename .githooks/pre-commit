@@ -1,0 +1,20 @@
+#!/bin/sh
+# Over-heal guardrail — blocks a commit if an AI heal changed what a test ASSERTS
+# (deleted/weakened an expect, changed an expected value, skipped a test, or swallowed
+# an error) rather than just repairing a selector/wait. Locator/wait/timeout repairs pass.
+#
+# Enabled via `git config core.hooksPath .githooks` (npm's "prepare" script sets this up
+# automatically after `npm install`). To bypass in a genuine emergency: `git commit --no-verify`.
+#
+# Runs only against staged spec files, so it's a no-op for commits that touch no tests.
+
+node scripts/heal-gate.mjs --staged
+status=$?
+if [ "$status" -ne 0 ]; then
+  echo ""
+  echo "commit blocked by heal-gate. Review the assertion change above."
+  echo "If the app genuinely changed, update the test intentionally and re-stage."
+  echo "To bypass (not recommended): git commit --no-verify"
+  exit 1
+fi
+exit 0

@@ -161,6 +161,24 @@ const executeStep = async (name: string, fn: () => Promise<void>) => {
 };
 ```
 
+## Step 5.5 — Snapshot Specs For The Heal-Gate (over-heal baseline)
+
+Immediately after writing/extending the specs — and **before** the Execute stage can heal
+them — copy each generated/modified spec to a baseline mirror so the over-heal gate can tell a
+legitimate locator repair from a masked assertion change:
+
+```bash
+# for every spec you created or changed this run:
+mkdir -p ".agents/heal-baseline/$(dirname tests/<path>.spec.ts)"
+cp "tests/<path>.spec.ts" ".agents/heal-baseline/tests/<path>.spec.ts"
+```
+
+This mirrors the file at `tests/...` to `.agents/heal-baseline/tests/...` (same sub-path). The
+directory is gitignored — it's per-run scratch. The gate (`scripts/heal-gate.mjs`) diffs the
+healed spec against this snapshot; without it, a freshly-generated spec that gets weakened in the
+same run has nothing to diff against (a committed test would fall back to `git HEAD`). Do this for
+every spec, new or extended.
+
 ## Step 6 — When Done Write To `.agents/test-tasks.md`
 
 ```markdown

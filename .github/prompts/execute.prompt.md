@@ -62,6 +62,29 @@ login/session timeout and several shared-account files ran together, the fix is
 3. WAIT for user response. Only if YES, run the git commands.
 
 ### If Tests Fail ❌
+
+**FIRST, classify the failure — this decides whether you may heal it at all:**
+- **Locator / environment failure** (element not found, timeout, navigation, dialog/cookie
+  block, session kick) → the test's *intent* is fine, only its *addressing* broke. Healable —
+  work the checklist below.
+- **Assertion failure** (the element was found, but its value/state/text is not what the test
+  expected) → the app behaved differently than documented. This is a **candidate real bug**, NOT
+  a heal target. Do NOT touch the assertion to make it pass. Mark **NEEDS REVIEW**, leave the
+  test failing, and flag to the user as a possible regression.
+
+**HARD RULE — LEGAL HEALS ONLY (never break):**
+A heal may ONLY edit *addressing and timing*: selectors/locators, `waitForSelector`/
+`waitForResponse`/waits, timeouts sourced from config, `goto`/navigation, and setup/imports.
+A heal may **NEVER**:
+- delete or comment out an `expect(...)` / test / step,
+- change a matcher (`toBeVisible`→`toBeAttached`, tighten→loosen),
+- change an expected value, or flip `.not.`,
+- add `test.skip`/`test.fixme`/`.only`,
+- wrap an assertion in `try/catch` or `.catch(() => {})` to swallow the failure.
+The moment a fix would require any of the above, it is **not a heal — it's masking a bug.** Stop,
+mark NEEDS REVIEW, and escalate. This is enforced mechanically by `scripts/heal-gate.mjs` (Step 3.5)
+and the pre-commit hook; a heal that trips it cannot be committed.
+
 Work through this checklist in order, applying ONE fix at a time:
 
 **Fix 1 — Selector not found:**
@@ -106,6 +129,21 @@ Do NOT edit selectors/timeouts for this one — it's a concurrency issue, not a 
 
 After each fix, re-run the test **once**.
 If still failing after one fix attempt → mark as **NEEDS REVIEW**, do not commit, flag to user.
+
+## Step 3.5 — Heal Gate (mechanical over-heal check) — REQUIRED before any commit ask
+
+If you healed ANY spec this run, run the gate before presenting results for commit:
+```bash
+npm run heal-gate                 # checks every spec that differs from its baseline
+# or target the healed files:  node scripts/heal-gate.mjs tests/<path>.spec.ts
+```
+- **Exit 0 / CLEAN** → heals were addressing/timing only; proceed to the commit ask.
+- **Exit 1 / BLOCKED** → a heal changed an assertion (removed/weakened/skipped/swallowed). Do
+  **NOT** proceed to commit. Revert that assertion to its baseline, re-diagnose as a possible
+  real bug, and mark the file **NEEDS REVIEW**. The pre-commit hook enforces this independently,
+  so a blocked heal cannot be committed even with approval — fix the heal, don't bypass the gate.
+
+The gate is a no-op when nothing was healed, so a clean generate-and-pass run skips it instantly.
 
 ## Step 4 — Update Both Log Files
 
