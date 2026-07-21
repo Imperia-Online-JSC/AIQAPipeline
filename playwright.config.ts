@@ -1,20 +1,21 @@
 import { defineConfig, devices } from '@playwright/test';
 import pipelineConfig from './config/pipeline.config.json';
+import { getScreenSize } from './tests/helpers/screen';
 
-// Headed runs should fill the real screen; headless runs (the CI/default path) must keep
-// the devices[...] fixed viewport (1280x720 etc) — Chromium headless falls back to a much
-// smaller default window when viewport is null, which breaks layout-dependent tests that
-// assume the usual desktop viewport size.
+// Every desktop project runs "fullscreen", but Chromium and Firefox/WebKit get there differently:
 //
-// This used to be handled here by sniffing `--headed` out of argv, but that only covers
-// plain CLI runs. The VS Code Playwright extension's Run/Debug buttons drive tests through
-// their own test-server protocol and never put a literal "--headed" string in argv, so that
-// detection silently never fired for VS Code runs, leaving the viewport pinned at 1280x720
-// regardless of actual window size. The fix now lives in tests/helpers/fixtures.ts, which
-// checks `testInfo.project.use.headless` at test runtime instead — that reflects the
-// *effective* value regardless of which path set it, and resizes explicitly via CDP, which
-// also works when VS Code reuses an already-running browser instead of launching a fresh
-// one (so launchOptions like --start-maximized would never even reach that process).
+// Chromium (target-chromium) uses viewport: null — the page fills the real browser window instead
+// of being pinned to a fixed size. That's the key to filling *whatever monitor the window opens on*
+// (a fixed viewport pinned to one screen's size leaves a gap when the window lands on a wider one —
+// exactly what happened with VS Code recording on an external display). Sizing comes from launch
+// args: --start-maximized fills the screen when headed/recording, --window-size sets the headless
+// window (headless ignores --start-maximized). For headed runs that reuse a browser (the VS Code
+// extension), tests/helpers/fixtures.ts also resizes the live window via CDP — see fixtures.ts.
+//
+// Firefox/WebKit have no CDP window-bounds API, so they keep a fixed viewport = the detected screen
+// size (getScreenSize()). That gives a full-size render for both headed and headless; fixtures.ts
+// re-syncs it to the real screen at runtime for headed.
+const screen = getScreenSize();
 
 export default defineConfig({
   testDir: './tests',
@@ -35,8 +36,17 @@ export default defineConfig({
     {
       name: 'target-chromium',
       use: {
-        ...devices['Desktop Chrome'],
+        // NB: intentionally not spreading devices['Desktop Chrome'] — its deviceScaleFactor is
+        // incompatible with viewport: null (Playwright throws). chromium is the default browser
+        // for a project with no device anyway.
         baseURL: pipelineConfig.app.baseURL,
+        viewport: null,
+        launchOptions: {
+          args: [
+            '--start-maximized',                              // headed/recording: fill the screen (no-op headless)
+            `--window-size=${screen.width},${screen.height}`, // headless: size the window (headed ignores it)
+          ],
+        },
       },
     },
     {
@@ -44,6 +54,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Firefox'],
         baseURL: pipelineConfig.app.baseURL,
+        viewport: screen,
       },
     },
     {
@@ -51,6 +62,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Safari'],
         baseURL: pipelineConfig.app.baseURL,
+        viewport: screen,
       },
     },
     {

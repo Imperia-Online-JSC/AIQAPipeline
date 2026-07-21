@@ -6,6 +6,7 @@
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:headed:chromium": "playwright test --headed --project=target-chromium",
+    "record": "node scripts/record.mjs",
     "report": "playwright show-report"
   },
   "keywords": ["playwright", "ai-qa", "e2e", "agent"],
