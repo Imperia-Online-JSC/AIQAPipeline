@@ -85,8 +85,12 @@ For each SCENARIO in `.agents/feedback.md`:
 ## Step 5 — Patterns To Always Follow
 
 ### Basic Test Structure
+Always import `test`/`expect` from `../helpers/fixtures`, never directly from
+`@playwright/test` — that shared module wraps them with an auto-fixture that makes headed
+runs (CLI `--headed` or the VS Code Playwright extension's Run/Debug buttons) fill whichever
+screen currently has focus. Importing straight from `@playwright/test` silently skips it.
 ```typescript
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../helpers/fixtures';
 import { <AppName>Page } from '../helpers/<AppName>Page';
 import pipelineConfig from '../../config/pipeline.config.json';
 

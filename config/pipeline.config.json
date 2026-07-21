@@ -1,14 +1,11 @@
 {
   "app": {
-    "name": "RottenTomatoes",
-    "baseURL": "https://www.rottentomatoes.com/browse/movies_coming_soon/",
+    "name": "Stillfront",
+    "baseURL": "https://www.stillfront.com/en/",
     "allowedURLs": [
-      "https://www.rottentomatoes.com/browse/movies_coming_soon/",
-      "https://www.rottentomatoes.com/browse/movies_in_theaters/",
-      "https://www.rottentomatoes.com/",
-      "https://www.rottentomatoes.com/m/"
+      "https://www.stillfront.com/en/"
     ],
-    "_comment_allowedURLs": "Hard allow-list. The Explore stage refuses to navigate anywhere not listed here — this is the guardrail that stops an agent from wandering onto production or a third-party domain. IMDB (originally targeted for its Release Calendar) actively blocks automated browser traffic via AWS WAF Bot Control (403/challenge on every page, confirmed IP/network-level, not tool-specific) — switched to Rotten Tomatoes' 'Coming Soon' browse page as the release-calendar equivalent. Scope kept to Coming Soon, In Theaters, home, and movie detail pages (/m/<slug>)."
+    "_comment_allowedURLs": "Hard allow-list. The Explore stage refuses to navigate anywhere not listed here — this is the guardrail that stops an agent from wandering onto production or a third-party domain. Scoped to /en/ (the search entry point) and its own search-results URLs (/en/?s=<query>, same path prefix), which is all the search feature touches."
   },
 
   "auth": {

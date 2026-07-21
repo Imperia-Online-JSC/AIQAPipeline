@@ -7,19 +7,27 @@
 |-------|--------|
 | Explore | ✅ Complete |
 | Tests Written | ✅ Complete |
-| Tests Passing | 8 of 8 |
+| Tests Passing | 4 of 4 (search suite, headless + headed) |
 | Commit Approved | ⏳ Waiting |
 
-- App tested: RottenTomatoes (https://www.rottentomatoes.com/browse/movies_coming_soon/)
+- App tested: Stillfront (https://www.stillfront.com/en/)
 - Branch: main
 - Tests committed: none yet
-- Next action: awaiting user YES/NO to commit the 5 spec files + RottenTomatoesPage helper
+- Next action: awaiting user YES/NO to commit:
+  1. Search tests — 3 new spec files (search-toggle, search-no-results, search-empty-query)
+     + StillfrontPage.ts extension (openSearchBox/searchToggleButton)
+  2. Headed-fullscreen fix — tests/helpers/fixtures.ts (new), playwright.config.ts
+     (simplified, no more argv-sniffing), 13 spec files' import switched to the shared
+     fixtures module, package.json test:headed:chromium script
 
 ## Note
-- IMDB (originally targeted for its Release Calendar) is blocked for this pipeline: AWS WAF
-  Bot Control returns 403/challenge on every page (confirmed IP/network-level via curl and
-  agent-browser from two different networks on the same ISP; not tool- or headed/headless-specific).
-  Retargeted to Rotten Tomatoes' "Coming Soon" browse page as the release-calendar equivalent.
-- Prior Stillfront run (2026-07-16) is still uncommitted, awaiting separate YES/NO from the user.
-  Its files (tests/homepage/, tests/navigation/, tests/search/, tests/helpers/StillfrontPage.ts)
-  are untouched by this run and remain pending in git status.
+- The headed-maximize fix was redesigned this run: the previous approach (detecting
+  `--headed` via `process.argv`) never worked for VS Code's Playwright extension, which
+  drives tests through its own test-server protocol instead of a literal `--headed` CLI
+  flag — confirmed by decompiling the extension. Replaced with a runtime check in
+  tests/helpers/fixtures.ts (`testInfo.project.use.headless === false`), which reflects the
+  effective value regardless of invocation path, and resizes explicitly via CDP (Chromium)
+  or setViewportSize (Firefox/WebKit) to whichever screen currently has focus. Verified via
+  CLI `--headed` (still works) and confirmed headless runs are unaffected (8/8 coming-soon
+  tests pass both ways). NOT yet verified against the actual VS Code Run/Debug button —
+  awaiting user confirmation.
