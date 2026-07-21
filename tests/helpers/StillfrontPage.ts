@@ -18,6 +18,14 @@ export class StillfrontPage {
     await this.page.keyboard.press('Enter');
   }
 
+  async openSearchBox() {
+    await this.act(this.page.getByRole('button', { name: 'Search button' }).first());
+  }
+
+  searchToggleButton() {
+    return this.page.getByRole('button', { name: 'Search button' }).first();
+  }
+
   async clickMainNavLink(name: string) {
     await this.act(
       this.page.getByRole('navigation', { name: 'Main menu' }).getByRole('link', { name, exact: true })
