@@ -23,3 +23,14 @@ node_modules/
 
 # NOTE: .agents/archive/ and .agents/pipeline-status.md are intentionally NOT ignored —
 # archive/ is the durable QA trail, pipeline-status.md is the at-a-glance current state.
+
+# --- Maintainer's local showcase demos (kept local, never pushed) ---
+# This repo is a clean, forkable template: the remote ships only tests/_shared/ (the
+# infra every target needs) and empty per-target structure. The demos below are used
+# locally to showcase the pipeline against real sites — ignored so a stray `git add .`
+# can't push them into the template. They are named EXPLICITLY, not by a blanket
+# `tests/*/` rule, so that a FORK's own target folders (tests/<your-app>/) commit
+# normally. In your own fork, delete these lines.
+/tests/abv-bg/
+/tests/helpers/
+config/pipeline.config.demo-abv-bg.json

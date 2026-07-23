@@ -26,11 +26,14 @@ any stage — do not guess a target or invent a URL.
 - Because `baseURL` is always set from config, specs should use relative paths
   (`page.goto('some/path')`), never a hard-coded absolute URL.
 
-## Page Object: `tests/helpers/<AppName>Page.ts`
-Unlike a hand-maintained helper for one app, this file **does not exist until the Generate
-stage creates it** from Explore-stage findings, then gets extended on later runs. See
-`.github/prompts/generate.prompt.md` Step 2 for the generation rules (selector priority:
-`getByRole` > `getByLabel`/`getByPlaceholder` > `data-testid` > CSS id, in that order).
+## Page Object: `tests/<app.testDir>/helpers/<AppName>Page.ts`
+Each target gets its own folder under `tests/` (the slug comes from `app.testDir` in the
+config), and that folder holds both the target's specs and its page object under
+`helpers/`. Unlike a hand-maintained helper for one app, this file **does not exist until
+the Generate stage creates it** from Explore-stage findings, then gets extended on later
+runs. See `.github/prompts/generate.prompt.md` Step 2 for the generation rules (selector
+priority: `getByRole` > `getByLabel`/`getByPlaceholder` > `data-testid` > CSS id, in that
+order).
 
 ## Registration / Login Patterns
 Driven entirely by `config/pipeline.config.json`'s `auth` block — see `README.md` for the
@@ -56,9 +59,15 @@ Read from `config/pipeline.config.json`'s `timeouts` block (`simple`, `sharedAcc
 in `playwright.config.ts` — set per test via `test.setTimeout(...)`.
 
 ## Directory Conventions
-- `tests/` — all spec files (`*.spec.ts`) and the `helpers/` subfolder
-- `tests/helpers/` — generated page-object helper(s); add new reusable actions here
+- `tests/` — one folder per target app, plus the shared `_shared/` folder
+- `tests/_shared/` — cross-target test infrastructure (`fixtures.ts`, `screen.ts`); shared by
+  every target, never duplicated into a target folder
+- `tests/<app.testDir>/` — everything for one target: its `*.spec.ts` files (directly inside,
+  or in feature subfolders) and its page object under `helpers/<AppName>Page.ts`
+- Each target folder is self-contained — adding or removing a target is one folder, with no
+  cross-target coupling
 - `config/pipeline.config.json` — the only file you edit to point at a new target app
+  (`app.testDir` sets that target's folder slug)
 - `.agents/` — run-to-run communication files; `.agents/archive/` is the durable, committed
   QA trail, the rest (`feedback.md`, `test-tasks.md`, `execution-log.md`) reset every run
 

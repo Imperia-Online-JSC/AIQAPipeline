@@ -63,6 +63,20 @@ For every area you test, check:
       if `type: networkResponse`, note the actual request URL(s) you observe so Stage 2 can
       wait on the real pattern instead of a fixed sleep)
 
+## Document Observed Behaviour — Never Infer A Mechanism
+Record what you **saw**, not how you assume it works. This one rule prevents the most common
+wasted heal/correction loop: Generate writing an assertion on a mechanism the app doesn't use.
+- For validation, redirects, and errors, write down the **user-facing signal** — the exact
+  message text that appears, whether the page navigated (and to where), what became visible/
+  disabled. Do NOT claim a field is HTML5 `required`, that a check is client-side, that a value
+  is stored a certain way, etc., unless you actually verified it.
+- When you DO record a DOM attribute, read its **value** with `--json` and quote the real value,
+  e.g. `agent-browser get attr @eN required --json` → `"value": null` (absent) vs `"value": ""`
+  (present). ⚠️ The plain `get attr` output line `✓ Done` is a **status indicator, not the
+  attribute value** — an absent attribute and a present one look identical without `--json`.
+- Net effect: Generate asserts real behaviour Execute can reproduce on the first run, instead of
+  an inferred mechanism that fails and triggers a correction loop.
+
 ## Output Format
 Write exactly this structure to `.agents/feedback.md`:
 
@@ -112,7 +126,7 @@ Write exactly this structure to `.agents/feedback.md`:
 - Expected: [result]
 - Actual: [what happened]
 - Priority: HIGH / MEDIUM / LOW
-- Suggested file: tests/[folder]/[name].spec.ts
+- Suggested file: tests/<app.testDir>/[name].spec.ts
 
 ### SCENARIO_002
 [repeat for every issue or gap found]

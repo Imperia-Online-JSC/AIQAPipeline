@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 import pipelineConfig from './config/pipeline.config.json';
-import { getScreenSize } from './tests/helpers/screen';
+import { getScreenSize } from './tests/_shared/screen';
 
 // Every desktop project runs "fullscreen", but Chromium and Firefox/WebKit get there differently:
 //
@@ -10,7 +10,7 @@ import { getScreenSize } from './tests/helpers/screen';
 // exactly what happened with VS Code recording on an external display). Sizing comes from launch
 // args: --start-maximized fills the screen when headed/recording, --window-size sets the headless
 // window (headless ignores --start-maximized). For headed runs that reuse a browser (the VS Code
-// extension), tests/helpers/fixtures.ts also resizes the live window via CDP — see fixtures.ts.
+// extension), tests/_shared/fixtures.ts also resizes the live window via CDP — see fixtures.ts.
 //
 // Firefox/WebKit have no CDP window-bounds API, so they keep a fixed viewport = the detected screen
 // size (getScreenSize()). That gives a full-size render for both headed and headless; fixtures.ts

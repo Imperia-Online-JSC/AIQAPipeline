@@ -3,7 +3,7 @@ import { execSync } from 'node:child_process';
 // "Fullscreen" for a headless run means the render viewport — there is no visible window — so we
 // size it to the host's MAIN display in CSS points (what a browser actually sees), detected fresh
 // each run so it mirrors whatever machine/monitor the run happens on. Headed runs don't rely on
-// this: tests/helpers/fixtures.ts reads the real screen at test-runtime and resizes the actual
+// this: tests/_shared/fixtures.ts reads the real screen at test-runtime and resizes the actual
 // window (which also handles a window that maximized onto a different monitor than the main one).
 //
 // Falls back to Full HD when the platform can't be probed (non-macOS, sandboxed, parse failure),

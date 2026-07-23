@@ -49,7 +49,7 @@ identical for both** — only the wrapper that runs each command differs.
 | Stage | Pattern (both tools) | Copilot runs it via | Claude Code runs it via |
 |-------|-----------------------|----------------------|--------------------------|
 | 1. Explore | drive the **`agent-browser` CLI** (`agent-browser skills get core`, then `open`/`snapshot`/`click`…) and write `.agents/feedback.md`. **Playwright MCP browser = fallback only on a real agent-browser failure, recorded in the header.** | `execute` (terminal) + `edit` | `Bash` + `Write`/`Edit` |
-| 2. Generate | turn findings into a page-object helper (`tests/helpers/<AppName>Page.ts`) and Playwright specs | `edit` + `read`/`search` + the Playwright MCP generator if used | `Write`/`Edit` + `Read`/`Grep` |
+| 2. Generate | turn findings into a page-object helper (`tests/<app.testDir>/helpers/<AppName>Page.ts`) and Playwright specs under `tests/<app.testDir>/` | `edit` + `read`/`search` + the Playwright MCP generator if used | `Write`/`Edit` + `Read`/`Grep` |
 | 3. Execute + heal | `npx playwright test … --reporter=list`, apply the fix checklist, re-run | `execute` + `edit` | `Bash` + `Read`/`Edit` |
 | 4. Commit | `git add` / `git commit` — **only after explicit YES** | `execute` (git) | `Bash` (git) |
 
@@ -141,9 +141,10 @@ requiring a product decision → STOP and ask the user.**
 
 > Follow all rules from `generate.prompt.md` exactly.
 
-Read `.agents/feedback.md`, check whether `tests/helpers/<AppName>Page.ts` already exists
-from a previous run (extend it) or needs generating fresh from this run's exploration.
-Write specs per scenario, then write `.agents/test-tasks.md`.
+Read `.agents/feedback.md`, check whether `tests/<app.testDir>/helpers/<AppName>Page.ts`
+already exists from a previous run (extend it) or needs generating fresh from this run's
+exploration. Write specs per scenario under `tests/<app.testDir>/`, then write
+`.agents/test-tasks.md`.
 
 Update `.agents/pipeline-status.md` (Stage 2 → ✅, Stage 3 → 🔄). Tell the user:
 ```

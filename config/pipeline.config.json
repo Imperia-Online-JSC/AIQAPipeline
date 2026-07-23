@@ -1,15 +1,17 @@
 {
   "app": {
-    "name": "Stillfront",
-    "baseURL": "https://www.stillfront.com/en/",
+    "name": "CHANGE_ME",
+    "testDir": "CHANGE_ME",
+    "_comment_testDir": "Kebab-case folder slug for this target under tests/ (e.g. 'my-app'). Everything for this target lives in tests/<testDir>/ — specs directly inside it, and the page-object helper at tests/<testDir>/helpers/<AppName>Page.ts. Derive it once from app.name (AbvBg -> abv-bg) and keep it stable across runs so tests don't scatter across differently-named folders.",
+    "baseURL": "CHANGE_ME",
     "allowedURLs": [
-      "https://www.stillfront.com/en/"
+      "CHANGE_ME"
     ],
-    "_comment_allowedURLs": "Hard allow-list. The Explore stage refuses to navigate anywhere not listed here — this is the guardrail that stops an agent from wandering onto production or a third-party domain. Scoped to /en/ (the search entry point) and its own search-results URLs (/en/?s=<query>, same path prefix), which is all the search feature touches."
+    "_comment_allowedURLs": "Hard allow-list. The Explore stage refuses to navigate anywhere not listed here — this is the guardrail that stops an agent from wandering onto production or a third-party domain. List only the pages actually explored/tested. If the target is a live third-party site you don't own, keep auth.strategy 'none' and NEVER perform a state-mutating action (login, submit, post)."
   },
 
   "auth": {
-    "strategy": "none",
+    "strategy": "CHANGE_ME",
     "_comment_strategy": "one of: none | fresh-registration | existing-credentials",
 
     "fresh": {

@@ -14,8 +14,9 @@ account, and one backend's async-response quirks. This version pulls all of that
    (Playwright MCP browser as a documented fallback only), documents bugs, coverage gaps,
    and the concrete selectors/flows it found. Writes `.agents/feedback.md`.
 2. **Generate** — turns that into a Playwright page-object helper
-   (`tests/helpers/<AppName>Page.ts`, generated fresh the first time, extended on later
-   runs) and `.spec.ts` files. Writes `.agents/test-tasks.md`.
+   (`tests/<app.testDir>/helpers/<AppName>Page.ts`, generated fresh the first time, extended
+   on later runs) and `.spec.ts` files under the same target folder. Writes
+   `.agents/test-tasks.md`.
 3. **Execute** — runs the new tests, applies a small fix checklist to common failures
    (selector timing, async waits, dialogs, cookie banners, shared-account collisions),
    and asks for explicit approval before committing anything to git.
@@ -32,12 +33,18 @@ Edit `config/pipeline.config.json`:
 {
   "app": {
     "name": "MyApp",
+    "testDir": "my-app",
     "baseURL": "https://staging.myapp.com/",
     "allowedURLs": ["https://staging.myapp.com/"]
   },
   "auth": { "strategy": "none" }
 }
 ```
+
+- `app.testDir` is the kebab-case folder slug for this target under `tests/`. Everything the
+  pipeline generates for the app lands in `tests/<testDir>/` (specs) and
+  `tests/<testDir>/helpers/` (its page object), so each target is a self-contained folder.
+  Derive it once from `app.name` (`MyApp` → `my-app`) and keep it stable across runs.
 
 - `auth.strategy`: `none` (public pages only), `fresh-registration` (self-registers a
   unique account per run — safe to parallelize), or `existing-credentials` (a real
@@ -79,8 +86,34 @@ npx playwright show-report
 - `.claude/skills/pipeline/` — Claude Code's `/pipeline` entry point
 - `.agents/` — run-to-run communication files (`feedback.md`, `test-tasks.md`,
   `execution-log.md`, `pipeline-status.md`) plus `archive/` (durable QA trail, committed)
-- `tests/` — generated `.spec.ts` files
-- `tests/helpers/` — generated page-object helper(s), one per target app
+- `tests/_shared/` — cross-target test infrastructure (`fixtures.ts`, `screen.ts`)
+- `tests/<app.testDir>/` — one self-contained folder per target app: its `.spec.ts` files
+  plus its page object under `helpers/<AppName>Page.ts`
+
+### Test folder structure
+
+Each target the pipeline is pointed at gets its own folder, so tests never pile into one
+shared directory as targets accumulate:
+
+```
+tests/
+  _shared/                     # infra shared by every target
+    fixtures.ts                #   headed-run screen-fill auto-fixture
+    screen.ts                  #   screen-size detection for fullscreen runs
+  my-app/                      # a target (app.testDir = "my-app")
+    helpers/
+      MyAppPage.ts             #   generated/extended page object
+    login.spec.ts
+    search.spec.ts
+  another-app/                 # a second target — fully independent
+    helpers/AnotherAppPage.ts
+    checkout.spec.ts
+```
+
+A spec in `tests/<target>/` imports shared infra as `../_shared/fixtures` and its own page
+object as `./helpers/<AppName>Page`. Adding or removing a target is a single folder with no
+cross-target coupling. This repo's remote ships only `tests/_shared/` and this structure —
+point the config at your app and the first pipeline run creates your target folder.
 
 ## Known limitation
 
